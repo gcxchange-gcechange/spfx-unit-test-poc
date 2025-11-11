@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "spfx-unit-test-poc-client-side-solution",
+    "id": "091ffbc9-0127-48ea-91a7-21cc29f6af42",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "spfx-unit-test-poc description"
+      },
+      "longDescription": {
+        "default": "spfx-unit-test-poc description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "spfx-unit-test-poc Feature",
+        "description": "The feature that activates elements of the spfx-unit-test-poc solution.",
+        "id": "06646954-50c4-4a82-a87a-a2359e5549a8",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx-unit-test-poc.sppkg"
+  }
+}

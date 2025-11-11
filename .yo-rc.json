@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.14.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "spfx-unit-test-poc",
+    "libraryId": "091ffbc9-0127-48ea-91a7-21cc29f6af42",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx-unit-test-poc",
+    "solutionShortDescription": "spfx-unit-test-poc description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
