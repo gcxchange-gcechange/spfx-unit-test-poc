@@ -3,7 +3,13 @@ import styles from './UnitTestPoc.module.scss';
 import type { IUnitTestPocProps } from './IUnitTestPocProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 
-export default class UnitTestPoc extends React.Component<IUnitTestPocProps> {
+export default class UnitTestPoc extends React.Component<IUnitTestPocProps, { count: number }> {
+
+  constructor(props: IUnitTestPocProps) {
+    super(props);
+    this.state = { count: 0 };
+  }
+
   public render(): React.ReactElement<IUnitTestPocProps> {
     const {
       description,
@@ -26,6 +32,8 @@ export default class UnitTestPoc extends React.Component<IUnitTestPocProps> {
           <p>
             The SharePoint Framework (SPFx) is a extensibility model for Microsoft Viva, Microsoft Teams and SharePoint. It&#39;s the easiest way to extend Microsoft 365 with automatic Single Sign On, automatic hosting and industry standard tooling.
           </p>
+          <button onClick={() => this.setState({ count: this.state.count + 1 })}>Increment</button>
+           <p>Count: {this.state.count}</p>
           <h4>Learn more about SPFx development:</h4>
           <ul className={styles.links}>
             <li><a href="https://aka.ms/spfx" target="_blank" rel="noreferrer">SharePoint Framework Overview</a></li>

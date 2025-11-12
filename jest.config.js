@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
@@ -16,9 +18,7 @@ module.exports = {
     '/node_modules/'
   ],
   globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.jest.json'
-    }
+
   },
   transformIgnorePatterns: [
     'node_modules/(?!(office-ui-fabric-react|@fluentui/react)/)',
