@@ -122,5 +122,6 @@ stages:
                 # Upload & publish the SPFx package
                 Add-PnPApp `
                   -Path "$(Pipeline.Workspace)/spfx-package/*.sppkg" `
+                  -Scope Site `
                   -Overwrite `
                   -Publish
