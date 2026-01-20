@@ -33,7 +33,13 @@ stages:
               version: 18.x
 
           - script: |
-              NODE_RANGE=$(node -p "require('./package.json').engines.node")
+              NODE_RANGE=$(node -p "require('./package.json').engines?.node || ''")
+
+              if [ -z "$NODE_RANGE" ]; then
+                echo "ERROR: package.json is missing engines.node"
+                exit 1
+              fi
+
               echo "Found Node engine range: $NODE_RANGE"
 
               MAJOR=$(echo "$NODE_RANGE" | grep -oE '[0-9]+' | head -1)
@@ -50,8 +56,25 @@ stages:
           - script: npm ci
             displayName: Install npm dependencies
 
-          - script: |
-              echo "Setting BUILD_ENV: ${{ parameters.environment }}"
-              export BUILD_ENV=${{ parameters.environment }}
-              gulp generate-config
-            displayName: Generate config files for ${{ parameters.environment }}
+          # TODO: Generate the config files
+          # - script: |
+          #     echo "Setting BUILD_ENV: ${{ parameters.environment }}"
+          #     export BUILD_ENV=${{ parameters.environment }}
+          #     gulp generate-config
+          #   displayName: Generate config files for ${{ parameters.environment }}
+
+          - script: npx gulp clean
+            displayName: SPFx clean
+          
+          - script: npx gulp bundle --ship
+            displayName: SPFx bundle
+          
+          - script: npx gulp package-solution --ship
+            displayName: SPFx package-solution
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish SPFx package
+            inputs:
+              PathtoPublish: sharepoint/solution/*.sppkg
+              ArtifactName: spfx-package
+              publishLocation: Container
