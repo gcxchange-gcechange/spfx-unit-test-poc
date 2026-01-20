@@ -1,0 +1,57 @@
+name: Build-Deploy
+
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: environment
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - uat
+      - prod
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build_Package
+        displayName: SPFx build & package
+        steps:
+          - task: UseNode@1
+            displayName: Bootstrap Node (temporary)
+            inputs:
+              version: 18.x
+
+          - script: |
+              NODE_RANGE=$(node -p "require('./package.json').engines.node")
+              echo "Found Node engine range: $NODE_RANGE"
+
+              MAJOR=$(echo "$NODE_RANGE" | grep -oE '[0-9]+' | head -1)
+              echo "Resolved Node major: $MAJOR.x"
+
+              echo "##vso[task.setvariable variable=NODE_VERSION]$MAJOR.x"
+            displayName: Find Node version from package.json
+
+          - task: UseNode@1
+            displayName: 'Use Node.js $(NODE_VERSION)'
+            inputs:
+              version: $(NODE_VERSION)
+
+          - script: npm ci
+            displayName: Install npm dependencies
+
+          - script: |
+              echo "Setting BUILD_ENV: ${{ parameters.environment }}"
+              export BUILD_ENV=${{ parameters.environment }}
+              gulp generate-config
+            displayName: Generate config files for ${{ parameters.environment }}
