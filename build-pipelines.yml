@@ -92,28 +92,28 @@ stages:
               artifactName: spfx-package
               downloadPath: '$(Pipeline.Workspace)/spfx-package'
 
-          - task: AzureKeyVault@2
-            inputs:
-              azureSubscription: 'MyServiceConnection'
-              KeyVaultName: 'Prod-SPFx-KV'
-              SecretsFilter: '*'
-              RunAsPreJob: true
+          # - task: AzureKeyVault@2
+          #   inputs:
+          #     azureSubscription: 'MyServiceConnection'
+          #     KeyVaultName: 'Prod-SPFx-KV'
+          #     SecretsFilter: '*'
+          #     RunAsPreJob: true
 
-          - task: PowerShell@2
-            displayName: Deploy SPFx package to App Catalog
-            inputs:
-              pwsh: true
-              targetType: inline
-              script: |
-                Install-Module PnP.PowerShell -Force -Scope CurrentUser
+          # - task: PowerShell@2
+          #   displayName: Deploy SPFx package to App Catalog
+          #   inputs:
+          #     pwsh: true
+          #     targetType: inline
+          #     script: |
+          #       Install-Module PnP.PowerShell -Force -Scope CurrentUser
 
-                Connect-PnPOnline `
-                  -Url $(APP_CATALOG_URL) `
-                  -Tenant $(TENANT_ID) `
-                  -ClientId $(CLIENT_ID) `
-                  -CertificatePath $(CERT_PATH)
+          #       Connect-PnPOnline `
+          #         -Url $(APP_CATALOG_URL) `
+          #         -Tenant $(TENANT_ID) `
+          #         -ClientId $(CLIENT_ID) `
+          #         -CertificatePath $(CERT_PATH)
 
-                Add-PnPApp `
-                  -Path "$(Pipeline.Workspace)/spfx-package/*.sppkg" `
-                  -Overwrite `
-                  -Publish
+          #       Add-PnPApp `
+          #         -Path "$(Pipeline.Workspace)/spfx-package/*.sppkg" `
+          #         -Overwrite `
+          #         -Publish
