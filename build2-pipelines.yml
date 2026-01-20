@@ -100,20 +100,26 @@ stages:
           #    SecretsFilter: '*'
           #    RunAsPreJob: true
 
-          - task: PowerShell@2
-            displayName: Deploy SPFx package to App Catalog
+          - task: AzureCLI@2
+            displayName: Deploy SPFx package (WIF)
             inputs:
-              pwsh: true
-              targetType: inline
-              script: |
+              azureSubscription: 'deploy-pipeline-kv'
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
                 Install-Module PnP.PowerShell -Force -Scope CurrentUser
 
-                Connect-PnPOnline `
-                  -Url $(APP_CATALOG_URL) `
-                  -Tenant $(TENANT_ID) `
-                  -ClientId $(CLIENT_ID) `
-                  -Federation
+                # Get Graph access token using WIF identity
+                $token = az account get-access-token `
+                  --resource https://graph.microsoft.com `
+                  --query accessToken -o tsv
 
+                # Connect to SharePoint using the token
+                Connect-PnPOnline `
+                  -Url "$(APP_CATALOG_URL)" `
+                  -AccessToken $token
+
+                # Upload & publish the SPFx package
                 Add-PnPApp `
                   -Path "$(Pipeline.Workspace)/spfx-package/*.sppkg" `
                   -Overwrite `
