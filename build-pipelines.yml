@@ -1,0 +1,119 @@
+name: Build-Deploy
+
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: environment
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - uat
+      - prod
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build_Package
+        displayName: SPFx build & package
+        steps:
+          - task: UseNode@1
+            displayName: Bootstrap Node (temporary)
+            inputs:
+              version: 18.x
+
+          - script: |
+              NODE_RANGE=$(node -p "require('./package.json').engines?.node || ''")
+
+              if [ -z "$NODE_RANGE" ]; then
+                echo "ERROR: package.json is missing engines.node"
+                exit 1
+              fi
+
+              echo "Found Node engine range: $NODE_RANGE"
+
+              MAJOR=$(echo "$NODE_RANGE" | grep -oE '[0-9]+' | head -1)
+              echo "Resolved Node major: $MAJOR.x"
+
+              echo "##vso[task.setvariable variable=NODE_VERSION]$MAJOR.x"
+            displayName: Find Node version from package.json
+
+          - task: UseNode@1
+            displayName: 'Use Node.js $(NODE_VERSION)'
+            inputs:
+              version: $(NODE_VERSION)
+
+          - script: npm ci
+            displayName: Install npm dependencies
+
+          # TODO: Generate the config files
+          # - script: |
+          #     echo "Setting BUILD_ENV: ${{ parameters.environment }}"
+          #     export BUILD_ENV=${{ parameters.environment }}
+          #     gulp generate-config
+          #   displayName: Generate config files for ${{ parameters.environment }}
+
+          - script: npx gulp clean
+            displayName: SPFx clean
+          
+          - script: npx gulp bundle --ship
+            displayName: SPFx bundle
+          
+          - script: npx gulp package-solution --ship
+            displayName: SPFx package-solution
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish SPFx package
+            inputs:
+              PathtoPublish: sharepoint/solution
+              ArtifactName: spfx-package
+              publishLocation: Container
+
+  - stage: Deploy
+    dependsOn: Build
+    jobs:
+      - job: Deploy
+        displayName: Deploy SPFx to App Catalog
+        steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: Download SPFx package
+            inputs:
+              buildType: 'current'
+              artifactName: spfx-package
+              downloadPath: '$(Pipeline.Workspace)/spfx-package'
+
+          # - task: AzureKeyVault@2
+          #   inputs:
+          #     azureSubscription: 'MyServiceConnection'
+          #     KeyVaultName: 'Prod-SPFx-KV'
+          #     SecretsFilter: '*'
+          #     RunAsPreJob: true
+
+          # - task: PowerShell@2
+          #   displayName: Deploy SPFx package to App Catalog
+          #   inputs:
+          #     pwsh: true
+          #     targetType: inline
+          #     script: |
+          #       Install-Module PnP.PowerShell -Force -Scope CurrentUser
+
+          #       Connect-PnPOnline `
+          #         -Url $(APP_CATALOG_URL) `
+          #         -Tenant $(TENANT_ID) `
+          #         -ClientId $(CLIENT_ID) `
+          #         -CertificatePath $(CERT_PATH)
+
+          #       Add-PnPApp `
+          #         -Path "$(Pipeline.Workspace)/spfx-package/*.sppkg" `
+          #         -Overwrite `
+          #         -Publish
