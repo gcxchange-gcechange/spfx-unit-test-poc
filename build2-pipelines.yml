@@ -129,24 +129,12 @@ stages:
 
                 Write-Host "Deploying: $($sppkgFile.FullName)"
 
-                $fileName = $sppkgFile.Name
-                $fileBytes = [System.IO.File]::ReadAllBytes($sppkgFile.FullName)
+                $ConfirmPreference = 'None'
 
-                # Upload the .sppkg to the tenant app catalog
-                $uploadResponse = Invoke-PnPSPRestMethod `
-                -Method Post `
-                -Url "/_api/web/tenantappcatalog/Add(overwrite=true, url='$fileName')" `
-                -Content $fileBytes `
-                -ContentType "application/octet-stream"
-
-                $appId = $uploadResponse.UniqueId
-                Write-Host "Uploaded app ID: $appId"
-
-                # Deploy it
-                Invoke-PnPSPRestMethod `
-                -Method Post `
-                -Url "/_api/web/tenantappcatalog/AvailableApps/GetById('$appId')/Deploy" `
-                -Content "{}" `
-                -ContentType "application/json;odata=verbose"
-
-                Write-Host "Deployment complete"
+                # TODO: See if Scope Site can work
+                Add-PnPApp `
+                  -Path $sppkgFile.FullName `
+                  -Scope Tenant `
+                  -Overwrite `
+                  -Publish `
+                  -Force
