@@ -129,9 +129,10 @@ stages:
 
                 Write-Host "Deploying: $($sppkgFile.FullName)"
 
+                # TODO: See if Scope Site can work
                 Add-PnPApp `
                   -Path $sppkgFile.FullName `
-                  -Scope Tenant ` # Scope Site not working
+                  -Scope Tenant `
                   -Overwrite `
-                  -Publish
+                  -Publish `
                   -Confirm:$false
