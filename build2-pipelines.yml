@@ -131,6 +131,6 @@ stages:
 
                 Add-PnPApp `
                   -Path $sppkgFile.FullName `
-                  -Scope Site `
+                  -Scope Tenant ` # Scope Site not working
                   -Overwrite `
                   -Publish
