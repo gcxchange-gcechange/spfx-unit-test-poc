@@ -132,8 +132,13 @@ stages:
                 $ConfirmPreference = 'None'
 
                 # TODO: See if Scope Site can work
-                Add-PnPApp `
-                  -Path $sppkgFile.FullName `
-                  -Scope Tenant `
-                  -Overwrite `
-                  -Publish
+                # Upload the package (no prompt)
+                $app = Add-PnPApp `
+                -Path $sppkgFile.FullName `
+                -Scope Tenant `
+                -Overwrite
+
+                # Publish/deploy it separately
+                Publish-PnPApp `
+                -Identity $app.Id `
+                -Scope Tenant
