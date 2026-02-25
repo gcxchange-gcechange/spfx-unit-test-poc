@@ -131,10 +131,16 @@ stages:
 
                 $ConfirmPreference = 'None'
 
+                Grant-PnPAzureADAppSitePermission `
+                  -AppId $(CLIENT_ID) `
+                  -DisplayName "Deploy Pipeline" `
+                  -Site "$(APP_CATALOG_URL)" `
+                  -Permissions Write
+
                 # TODO: See if Scope Site can work
                 Add-PnPApp `
                   -Path $sppkgFile.FullName `
-                  -Scope Tenant `
+                  -Scope Site `
                   -Overwrite `
                   -Publish `
                   -Force
