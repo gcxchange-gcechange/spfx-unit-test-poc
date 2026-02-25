@@ -134,3 +134,4 @@ stages:
                   -Scope Tenant ` # Scope Site not working
                   -Overwrite `
                   -Publish
+                  -Confirm:$false
