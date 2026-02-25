@@ -90,7 +90,7 @@ stages:
             inputs:
               buildType: 'current'
               artifactName: spfx-package
-              downloadPath: '$(Pipeline.Workspace)/spfx-package'
+              downloadPath: '$(Pipeline.Workspace)'
 
           #- task: AzureKeyVault@2
           #  displayName: Get secrets from Key Vault
