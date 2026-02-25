@@ -119,9 +119,17 @@ stages:
                   -Url "$(APP_CATALOG_URL)" `
                   -AccessToken $token
 
-                # Upload & publish the SPFx package
+                # Resolve the .sppkg file path 
+                $sppkgFile = Get-Item "$(Pipeline.Workspace)/spfx-package/*.sppkg" | Select-Object -First 1
+                if (-not $sppkgFile) {
+                  Write-Error "No .sppkg file found in $(Pipeline.Workspace)/spfx-package/"
+                  exit 1
+                }
+
+                Write-Host "Deploying: $($sppkgFile.FullName)"
+
                 Add-PnPApp `
-                  -Path "$(Pipeline.Workspace)/spfx-package/*.sppkg" `
+                  -Path $sppkgFile.FullName `
                   -Scope Site `
                   -Overwrite `
                   -Publish
