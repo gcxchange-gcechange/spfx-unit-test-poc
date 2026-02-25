@@ -120,7 +120,8 @@ stages:
                   -AccessToken $token
 
                 # Resolve the .sppkg file path 
-                $sppkgFile = Get-Item "$(Pipeline.Workspace)/spfx-package/*.sppkg" | Select-Object -First 1
+                $sppkgFile = Get-ChildItem "$(Pipeline.Workspace)/spfx-package/" -Filter "*.sppkg" | Select-Object -First 1
+
                 if (-not $sppkgFile) {
                   Write-Error "No .sppkg file found in $(Pipeline.Workspace)/spfx-package/"
                   exit 1
