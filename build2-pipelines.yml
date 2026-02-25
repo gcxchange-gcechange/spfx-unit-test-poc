@@ -129,11 +129,24 @@ stages:
 
                 Write-Host "Deploying: $($sppkgFile.FullName)"
 
-                #$env:PNPPOWERSHELL_UPDATECHECK = "Off"
+                $fileName = $sppkgFile.Name
+                $fileBytes = [System.IO.File]::ReadAllBytes($sppkgFile.FullName)
 
-                # TODO: See if Scope Site can work
-                "y" | Add-PnPApp `
-                  -Path $sppkgFile.FullName `
-                  -Scope Tenant `
-                  -Overwrite `
-                  -Publish
+                # Upload the .sppkg to the tenant app catalog
+                $uploadResponse = Invoke-PnPSPRestMethod `
+                -Method Post `
+                -Url "/_api/web/tenantappcatalog/Add(overwrite=true, url='$fileName')" `
+                -Content $fileBytes `
+                -ContentType "application/octet-stream"
+
+                $appId = $uploadResponse.UniqueId
+                Write-Host "Uploaded app ID: $appId"
+
+                # Deploy it
+                Invoke-PnPSPRestMethod `
+                -Method Post `
+                -Url "/_api/web/tenantappcatalog/AvailableApps/GetById('$appId')/Deploy" `
+                -Content "{}" `
+                -ContentType "application/json;odata=verbose"
+
+                Write-Host "Deployment complete"
