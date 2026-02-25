@@ -109,9 +109,9 @@ stages:
               inlineScript: |
                 Install-Module PnP.PowerShell -Force -Scope CurrentUser
 
-                # Get Graph access token using WIF identity
+                # Get SharePoint access token using WIF identity
                 $token = az account get-access-token `
-                  --resource https://graph.microsoft.com `
+                  --resource "https://$(APP_CATALOG_TENANT).sharepoint.com" `
                   --query accessToken -o tsv
 
                 # Connect to SharePoint using the token
